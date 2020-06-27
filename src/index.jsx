@@ -8,9 +8,8 @@ import { createHttpLink } from "apollo-link-http";
 import { from, split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
 
-export function generateApolloClient(config) {
-  const uri = config.graphql_endpoint;
-  const auth = config.auth;
+export function generateApolloClient(auth, gql_endpoint) {
+  const uri = gql_endpoint;
 
   const wsUri = uri.startsWith("https")
     ? uri.replace(/^https/, "wss")
