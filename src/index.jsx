@@ -1,8 +1,9 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { ApolloProvider } from "react-apollo";
+// import { ApolloProvider } from "react-apollo";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import ApolloClient from "apollo-client";
-import { setContext } from "apollo-link-context";
+// import ApolloClient from "apollo-client";
+import { ApolloProvider, ApolloClient } from "@apollo/client";
+import { setContext } from "@apollo/link-context";
 import { WebSocketLink } from "apollo-link-ws";
 import { createHttpLink } from "apollo-link-http";
 import { from, split } from "apollo-link";
