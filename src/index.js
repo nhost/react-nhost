@@ -115,7 +115,7 @@ export class NhostAuthProvider extends React.Component {
       signedIn: props.auth.isAuthenticated(),
     };
 
-    auth.onAuthStateChanged((data) => {
+    props.auth.onAuthStateChanged((data) => {
       this.setState({ signedIn: data });
     });
   }

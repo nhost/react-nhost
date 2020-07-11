@@ -4,6 +4,43 @@
 
 Make it easy to use Nhost with React.
 
+- `NhostAuthProvider` - AuthProvider to simply check logged in state.
+- `NhostApolloProvider` - ApolloProvider preconfigured with authentication that works for mutation, queries and subscriptions.
+
+## Initiate
+
+### Create React App
+
+`index.js`
+
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+import { NhostAuthProvider, NhostApolloProvider } from "react-nhost";
+import { auth } from "[..]path_to//nhost";
+import App from "./App";
+
+ReactDOM.render(
+  <React.StrictMode>
+    <NhostAuthProvider auth={auth}>
+      <NhostApolloProvider
+        auth={auth}
+        gql_endpoint={`https://hasura-xxx.nhost.app/v1/graphql`}
+      >
+        <App />
+      </NhostApolloProvider>
+    </NhostAuthProvider>
+  </React.StrictMode>,
+  document.getElementById("root")
+);
+```
+
+### NextJS
+
+_(coming soon)_
+
+---
+
 ## Protected Route
 
 ### React Router
@@ -12,15 +49,21 @@ Make it easy to use Nhost with React.
 
 ```jsx
 import React from "react";
+import { useAuth } from "react-nhost";
 import { Route, Redirect } from "react-router-dom";
-import { auth } from "path_to_nhost_auth";
 
-function PrivateRoute({ children, ...rest }) {
+export function PrivateRoute({ children, ...rest }) {
+  const { signedIn } = useAuth();
+
+  if (signedIn === null) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        auth.isAuthenticated() ? (
+        signedIn ? (
           children
         ) : (
           <Redirect
@@ -51,14 +94,12 @@ import PrivateRoute from "[..]path_to/PrivateRoute.jsx";
       <Login />
     </Route>
     /* Protected routes */
-    <PrivateRoute>
-      <Route exact path="/dashboard">
-        <Dashboard />
-      </Route>
-      <Route exact path="/settings">
-        <Settings />
-      </Route>
-    </PrivateRoute>
+    <PrivateRoute exact path="/">
+      <Dashboard />
+    </Route>
+    <PrivateRoute exact path="/settings">
+      <Settings />
+    </Route>
   </Switch>
 </Router>;
 ```
