@@ -136,30 +136,3 @@ export function useAuth() {
   const context = useContext(AuthContext);
   return context;
 }
-
-export function protectRoute(Component) {
-  return () => {
-    const { signedIn } = useAuth();
-
-    // use redirects instead
-    // const router = useRouter();
-    // useEffect(() => {
-    //   if (signedIn === false) Router.push("/login");
-    // }, [signedIn]);
-
-    // wait to see if the user is logged in or not.
-    if (signedIn === null) {
-      return <div>Checking auth...</div>;
-    }
-
-    if (!signedIn) {
-      // we could either show a <Login /> (as a second parameter to `ProtectRoute`) or
-      // redirect the user using Router.redirect(`/login`); (redirect url could also be
-      // sent as a parameter to `ProtectRoute`)
-      return <div>Login form or redirect....</div>;
-    }
-
-    // render ProtectedRoute as normal
-    return <Component {...arguments} />;
-  };
-}
