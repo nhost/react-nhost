@@ -4,8 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "files": [
-    "./dist",
-    "./README.md"
+    "./dist"
   ],
   "scripts": {
     "dev": "./node_modules/.bin/babel src -w -d dist",
