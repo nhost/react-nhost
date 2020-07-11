@@ -1,16 +1,13 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { createContext, useContext } from "react";
 // import { ApolloProvider } from "react-apollo";
 import { InMemoryCache } from "apollo-cache-inmemory";
 // import ApolloClient from "apollo-client";
-import { ApolloClient } from "@apollo/client";
-import { ApolloProvider } from "@apollo/react-hooks";
-import { useQuery } from "@apollo/react-hooks";
+import { ApolloProvider, ApolloClient } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
 import { WebSocketLink } from "apollo-link-ws";
 import { createHttpLink } from "apollo-link-http";
 import { from, split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
-import gql from "graphql-tag";
 
 export function generateApolloClient(auth, gql_endpoint) {
   const getheaders = (auth) => {
