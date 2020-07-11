@@ -83,39 +83,53 @@ export function generateApolloClient(auth, gql_endpoint) {
   return client;
 }
 
-const client = generateApolloClient(
-  null,
-  `https://hasura-zgp96xwz.nhost.app/v1/graphql`
-);
+// const client = generateApolloClient(
+//   null,
+//   `https://hasura-zgp96xwz.nhost.app/v1/graphql`
+// );
 
-export function NhostApolloProvider(props) {
-  // const [client] = useState(() =>
-  //   generateApolloClient(props.auth, props.gql_endpoint)
-  // );
-  return <ApolloProvider client={client}>{props.children}</ApolloProvider>;
+// export function NhostApolloProvider(props) {
+// const [client] = useState(() =>
+//   generateApolloClient(props.auth, props.gql_endpoint)
+// );
+export class NhostApolloProvider extends React.Component {
+  constructor(props) {
+    super(props);
+    const { auth, gql_endpoint } = this.props;
+    this.client = generateApolloClient(auth, gql_endpoint);
+  }
+
+  render() {
+    return (
+      <ApolloProvider client={this.client}>
+        {this.props.children}
+      </ApolloProvider>
+    );
+  }
 }
 
-export const AuthContext = createContext();
+export const AuthContext = createContext({ signedIn: null });
 
-export function NhostAuthProvider(props) {
-  const [signedIn, setSignedIn] = useState(props.auth.isAuthenticated());
+export class NhostAuthProvider extends React.Component {
+  constructor(props) {
+    super(props);
 
-  useEffect(() => {
-    // beacause of potential race condition I want to set signedIn before I
-    // create an onAuthStateChanged.
-    setSignedIn(props.auth.isAuthenticated());
+    this.state = {
+      signedIn: props.auth.isAuthenticated(),
+    };
 
-    // setting onAuthStateChanged to detect login/logout
-    props.auth.onAuthStateChanged((data) => {
-      setSignedIn(data);
+    auth.onAuthStateChanged((data) => {
+      this.setState({ signedIn: data });
     });
-  }, []);
+  }
 
-  return (
-    <AuthContext.Provider value={{ signedIn }}>
-      {props.children}
-    </AuthContext.Provider>
-  );
+  render() {
+    return (
+      <AuthContext.Provider value={{ signedIn: this.state.signedIn }}>
+        {this.props.children}
+      </AuthContext.Provider>
+    );
+  }
 }
 
 export function useAuth() {
@@ -123,7 +137,7 @@ export function useAuth() {
   return context;
 }
 
-export function ProtectRoute(Component) {
+export function protectRoute(Component) {
   return () => {
     const { signedIn } = useAuth();
 
@@ -148,8 +162,4 @@ export function ProtectRoute(Component) {
     // render ProtectedRoute as normal
     return <Component {...arguments} />;
   };
-}
-
-export function MyComponent() {
-  return <div>My niiiice component</div>;
 }
