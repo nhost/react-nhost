@@ -100,5 +100,5 @@ function Dashboard(props) {
   return <div>My dashboard</div>;
 }
 
-export default protectRoute(Dashboard);
+export default privateRoute(Dashboard);
 ```
