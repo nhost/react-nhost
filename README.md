@@ -5,6 +5,8 @@ Make it easy to use Nhost with React.
 - `NhostAuthProvider` - AuthProvider to check logged-in state.
 - `NhostApolloProvider` - ApolloProvider preconfigured with authentication for GraphQL mutations, queries and subscriptions.
 
+If you are logged in, the `Authorization` header will be set with your JWT token.
+
 ## Initiate
 
 ### Create React App
@@ -52,6 +54,73 @@ const storage = nhost.storage();
 export { auth, storage };
 ```
 
+#### Usage
+
+**GrahQL**
+
+```jsx
+import React from "react";
+import { useQuery } from "@apollo/client";
+import gql from "graphql-tag";
+
+const GET_TODOS = gql`
+  query {
+    todos {
+      id
+      created_at
+      name
+      completed
+    }
+  }
+`;
+
+export function function App() {
+  const { loading, data } = useQuery(GET_TODOS);
+
+  if (loading) {
+    return <div>Loading..</div>;
+  }
+
+  return (
+    <div>
+      <h1>in app</h1>
+      {!data ? (
+        "no data"
+      ) : (
+        <ul>
+          {data.todos.map((todo) => {
+            return <li key={todo.id}>{todo.name}</li>;
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+```
+
+**Auth**
+
+````jsx
+import React from "react";
+import { useAuth } from "react-nhost";
+
+export MyComponent() {
+  const { signedIn } = useAuth();
+
+  if (!signedIn) {
+    return (
+    <div>You are not signed in.</div>;
+    );
+  }
+
+  return (
+    <div>You are signed in 🎉!</div>
+  );
+}
+
+---
+
 ### NextJS
 
 _(coming soon)_
@@ -94,7 +163,7 @@ export function PrivateRoute({ children, ...rest }) {
     />
   );
 }
-```
+````
 
 #### Usage
 
