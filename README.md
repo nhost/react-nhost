@@ -5,7 +5,7 @@ Make it easy to use Nhost with React.
 - `NhostAuthProvider` - AuthProvider to check logged-in state.
 - `NhostApolloProvider` - ApolloProvider preconfigured with authentication for GraphQL mutations, queries and subscriptions.
 
-If you are logged in, the `Authorization` header will be set with your JWT token.
+If a user is logged in, the `Authorization` header will be set with your JWT token.
 
 ## Initiate
 
@@ -38,6 +38,8 @@ ReactDOM.render(
 ```
 
 `src/utils/nhost.js`
+
+Learn more about `auth` and `storage` in the [nhost-js-sdk](https://github.com/nhost/nhost-js-sdk) repository.
 
 ```js
 import nhost from "nhost-js-sdk";
