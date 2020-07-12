@@ -242,3 +242,31 @@ function Dashboard(props) {
 
 export default privateRoute(Dashboard);
 ```
+
+# FAQ
+
+## Is `nhost-js-sdk` required?
+
+No. You can use `react-nhost` without `nhost-js-sdk`.
+
+All requests will be sent without an `Authorization` header. This means you can only interact with data that is allowed using the role set as `HASURA_GRAPHQL_UNAUTHORIZED_ROLE`. (default to `public` at Nhost) [Learn more about public access](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/unauthenticated-access.html).
+
+Here's an example:
+
+```jsx
+import React from "react";
+import ReactDOM from "react-dom";
+import { NhostApolloProvider } from "react-nhost";
+import App from "./App";
+
+ReactDOM.render(
+  <React.StrictMode>
+    <NhostApolloProvider
+      gql_endpoint={`https://hasura-xxx.nhost.app/v1/graphql`}
+    >
+      <App />
+    </NhostApolloProvider>
+  </React.StrictMode>,
+  document.getElementById("root")
+);
+```
