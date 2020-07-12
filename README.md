@@ -4,20 +4,22 @@
 
 Make it easy to use Nhost with React.
 
-- `NhostAuthProvider` - AuthProvider to simply check logged in state.
-- `NhostApolloProvider` - ApolloProvider preconfigured with authentication that works for mutation, queries and subscriptions.
+- `NhostAuthProvider` - AuthProvider to check logged-in state.
+- `NhostApolloProvider` - ApolloProvider preconfigured with authentication for GraphQL mutations, queries and subscriptions.
 
 ## Initiate
 
 ### Create React App
 
-`index.js`
+Add `NhostAuthProvider` and `NhostApolloProvider`.
+
+`src/index.js`
 
 ```jsx
 import React from "react";
 import ReactDOM from "react-dom";
 import { NhostAuthProvider, NhostApolloProvider } from "react-nhost";
-import { auth } from "[..]path_to//nhost";
+import { auth } from "utils/nhost.js";
 import App from "./App";
 
 ReactDOM.render(
@@ -35,7 +37,7 @@ ReactDOM.render(
 );
 ```
 
-`utils/nhost.js`
+`src/utils/nhost.js`
 
 ```js
 import nhost from "nhost-js-sdk";
@@ -62,7 +64,7 @@ _(coming soon)_
 
 ### React Router
 
-`PrivateRoute.jsx`
+`src/components/privateroute.jsx`
 
 ```jsx
 import React from "react";
@@ -99,7 +101,7 @@ export function PrivateRoute({ children, ...rest }) {
 #### Usage
 
 ```jsx
-import PrivateRoute from "[..]path_to/PrivateRoute.jsx";
+import PrivateRoute from "components/privteroute.jsx";
 
 <Router>
   <Switch>
@@ -125,7 +127,7 @@ import PrivateRoute from "[..]path_to/PrivateRoute.jsx";
 
 ### NextJS
 
-`privateRoute.jsx`
+`components/privateroute.jsx`
 
 ```jsx
 import { useAuth } from "react-nhost";
@@ -150,9 +152,11 @@ export function privateRoute(Component) {
 
 #### Usage
 
+`pages/dashboard.jsx`
+
 ```jsx
 import React from "react";
-import { protectRoute } from "[..]path_to/protectRoute.jsx";
+import { protectRoute } from "components/privateroute.jsx";
 
 function Dashboard(props) {
   return <div>My dashboard</div>;
