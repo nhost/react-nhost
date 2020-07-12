@@ -7,6 +7,14 @@ Make it easy to use Nhost with React.
 
 If a user is logged in, the `Authorization` header will be set with your JWT token.
 
+## Install
+
+```bash
+npm install react-nhost @apollo/client
+```
+
+`@apollo/client` is required for `react-nhost` to work. You will use `@apollo/client` for `useQuery`, `useMutation`, `useSubscription`.
+
 ## Initiate
 
 ### Create React App
