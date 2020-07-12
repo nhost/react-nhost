@@ -1,7 +1,5 @@
 # React Nhost
 
-> Experimental. Code and documentation might not be up-to-date.
-
 Make it easy to use Nhost with React.
 
 - `NhostAuthProvider` - AuthProvider to check logged-in state.
