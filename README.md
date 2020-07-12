@@ -103,7 +103,7 @@ export function function App() {
 
 **Auth**
 
-````jsx
+```jsx
 import React from "react";
 import { useAuth } from "react-nhost";
 
@@ -120,6 +120,7 @@ export MyComponent() {
     <div>You are signed in 🎉!</div>
   );
 }
+```
 
 ---
 
@@ -165,7 +166,7 @@ export function PrivateRoute({ children, ...rest }) {
     />
   );
 }
-````
+```
 
 #### Usage
 
