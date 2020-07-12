@@ -5,7 +5,7 @@ Make it easy to use Nhost with React.
 - `NhostAuthProvider` - AuthProvider to check logged-in state.
 - `NhostApolloProvider` - ApolloProvider preconfigured with authentication for GraphQL mutations, queries and subscriptions.
 
-If a user is logged in, the `Authorization` header will be set with your JWT token.
+If a user is logged in, the `Authorization` header will be set with your JWT token for all GraphQL requests.
 
 ## Install
 
