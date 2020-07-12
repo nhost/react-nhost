@@ -11,7 +11,7 @@ import { getMainDefinition } from "apollo-utilities";
 
 export function generateApolloClient(auth, gql_endpoint) {
   const getheaders = (auth) => {
-    if (auth) {
+    if (auth && auth.isAuthenticated()) {
       return {
         authorization: `Bearer ${auth.getJWTToken()}`,
       };
