@@ -10,7 +10,7 @@ If a user is logged in, the `Authorization` header will be set with your JWT tok
 ## Install
 
 ```bash
-npm install react-nhost @apollo/client
+npm install react-nhost @apollo/client graphql graphql-tag
 ```
 
 `@apollo/client` is required for `react-nhost` to work. You will use `@apollo/client` for `useQuery`, `useMutation`, `useSubscription`.
