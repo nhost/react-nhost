@@ -1,7 +1,5 @@
 import React, { createContext, useContext } from "react";
-// import { ApolloProvider } from "react-apollo";
 import { InMemoryCache } from "apollo-cache-inmemory";
-// import ApolloClient from "apollo-client";
 import { ApolloProvider, ApolloClient } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
 import { WebSocketLink } from "apollo-link-ws";
@@ -77,7 +75,7 @@ export function generateApolloClient(auth, gql_endpoint) {
     },
   });
 
-  return client;
+  return { client, wsLink };
 }
 
 // const client = generateApolloClient(
@@ -93,7 +91,22 @@ export class NhostApolloProvider extends React.Component {
   constructor(props) {
     super(props);
     const { auth, gql_endpoint } = this.props;
-    this.client = generateApolloClient(auth, gql_endpoint);
+    const { client, wsLink } = generateApolloClient(auth, gql_endpoint);
+    this.client = client;
+    this.wsLink = wsLink;
+
+    if (this.props.auth) {
+      this.props.auth.onAuthStateChanged((data) => {
+        // close previous subscription
+        this.wsLink.subscriptionClient.close(true, true);
+
+        // generate new apolloClient with the new logged in state
+        const { client, wsLink } = generateApolloClient(auth, gql_endpoint);
+        this.client = client;
+        this.wsLink = wsLink;
+        this.forceUpdate();
+      });
+    }
   }
 
   render() {
