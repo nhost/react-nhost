@@ -104,9 +104,19 @@ export class NhostApolloProvider extends React.Component {
         const { client, wsLink } = generateApolloClient(auth, gql_endpoint);
         this.client = client;
         this.wsLink = wsLink;
-        this.forceUpdate();
+        if (this.is_mounted) {
+          this.forceUpdate();
+        }
       });
     }
+  }
+
+  componentDidMount() {
+    this.is_mounted = true;
+  }
+
+  componentWillUnmount() {
+    this.is_mounted = false;
   }
 
   render() {
@@ -129,8 +139,18 @@ export class NhostAuthProvider extends React.Component {
     };
 
     props.auth.onAuthStateChanged((data) => {
-      this.setState({ signedIn: data });
+      if (this.is_mounted) {
+        this.setState({ signedIn: data });
+      }
     });
+  }
+
+  componentDidMount() {
+    this.is_mounted = true;
+  }
+
+  componentWillUnmount() {
+    this.is_mounted = false;
   }
 
   render() {
