@@ -120,7 +120,7 @@ export MyComponent() {
 
   if (!signedIn) {
     return (
-    <div>You are not signed in.</div>;
+      <div>You are not signed in.</div>;
     );
   }
 
@@ -193,10 +193,10 @@ import PrivateRoute from "components/privteroute.jsx";
     /* Protected routes */
     <PrivateRoute exact path="/">
       <Dashboard />
-    </Route>
+    </PrivateRoute>
     <PrivateRoute exact path="/settings">
       <Settings />
-    </Route>
+    </PrivateRoute>
   </Switch>
 </Router>;
 ```
