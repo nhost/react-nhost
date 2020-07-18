@@ -53,7 +53,7 @@ Learn more about `auth` and `storage` in the [nhost-js-sdk](https://github.com/n
 import nhost from "nhost-js-sdk";
 
 const config = {
-  base_url: "https://backend-xxx-nhost.app",
+  base_url: "https://backend-xxx.nhost.app",
 };
 
 nhost.initializeApp(config);
@@ -247,9 +247,7 @@ export default privateRoute(Dashboard);
 
 ## Is `nhost-js-sdk` required?
 
-No. You can use `react-nhost` without `nhost-js-sdk`.
-
-All requests will be sent without an `Authorization` header. This means you can only interact with data that is allowed using the role set as `HASURA_GRAPHQL_UNAUTHORIZED_ROLE`. (default to `public` at Nhost) [Learn more about public access](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/unauthenticated-access.html).
+No. You can use `react-nhost` without `nhost-js-sdk`. if you do, all requests will be sent without an `Authorization` header. This means you can only interact with data that is allowed using the role set as `HASURA_GRAPHQL_UNAUTHORIZED_ROLE`. (default to `public` at Nhost) [Learn more about public access](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/unauthenticated-access.html).
 
 Here's an example:
 
