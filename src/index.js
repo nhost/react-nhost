@@ -98,7 +98,11 @@ export class NhostApolloProvider extends React.Component {
     if (this.props.auth) {
       this.props.auth.onAuthStateChanged((data) => {
         // close previous subscription
-        this.wsLink.subscriptionClient.close(true, true);
+        try {
+          this.wsLink.subscriptionClient.close(true, true);
+        } catch (error) {
+          // noop. Probably not in a browser
+        }
 
         // generate new apolloClient with the new logged in state
         const { client, wsLink } = generateApolloClient(auth, gql_endpoint);
