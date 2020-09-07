@@ -7,16 +7,28 @@ import { createHttpLink } from "apollo-link-http";
 import { from, split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
 
-export function generateApolloClient(auth, gql_endpoint) {
+export function generateApolloClient(auth, gqlEndpoint, headers) {
   const getheaders = (auth) => {
-    if (auth && auth.isAuthenticated()) {
-      return {
-        authorization: `Bearer ${auth.getJWTToken()}`,
-      };
+    // add headers
+    const resHeaders = {
+      ...headers,
+    };
+
+    // add auth headers if signed in
+    // or add 'public' role if not signed in
+    if (auth) {
+      if (auth.isAuthenticated()) {
+        resHeaders.authorization = `Bearer ${auth.getJWTToken()}`;
+      } else {
+        resHeaders.role = "public";
+      }
     }
+
+    // return
+    return resHeaders;
   };
 
-  const uri = gql_endpoint;
+  const uri = gqlEndpoint;
 
   const wsUri = uri.startsWith("https")
     ? uri.replace(/^https/, "wss")
@@ -85,13 +97,13 @@ export function generateApolloClient(auth, gql_endpoint) {
 
 // export function NhostApolloProvider(props) {
 // const [client] = useState(() =>
-//   generateApolloClient(props.auth, props.gql_endpoint)
+//   generateApolloClient(props.auth, props.gqlEndpoint)
 // );
 export class NhostApolloProvider extends React.Component {
   constructor(props) {
     super(props);
-    const { auth, gql_endpoint } = this.props;
-    const { client, wsLink } = generateApolloClient(auth, gql_endpoint);
+    const { auth, gqlEndpoint, headers } = this.props;
+    const { client, wsLink } = generateApolloClient(auth, gqlEndpoint, headers);
     this.client = client;
     this.wsLink = wsLink;
 
@@ -105,7 +117,7 @@ export class NhostApolloProvider extends React.Component {
         }
 
         // generate new apolloClient with the new logged in state
-        const { client, wsLink } = generateApolloClient(auth, gql_endpoint);
+        const { client, wsLink } = generateApolloClient(auth, gqlEndpoint);
         this.client = client;
         this.wsLink = wsLink;
         if (this.is_mounted) {

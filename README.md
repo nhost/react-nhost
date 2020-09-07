@@ -35,7 +35,7 @@ ReactDOM.render(
     <NhostAuthProvider auth={auth}>
       <NhostApolloProvider
         auth={auth}
-        gql_endpoint={`https://hasura-xxx.nhost.app/v1/graphql`}
+        gqlEndpoint={`https://hasura-xxx.nhost.app/v1/graphql`}
       >
         <App />
       </NhostApolloProvider>
@@ -145,41 +145,28 @@ _(coming soon)_
 `src/components/privateroute.jsx`
 
 ```jsx
-import React from "react";
-import { useAuth } from "react-nhost";
-import { Route, Redirect } from "react-router-dom";
-
-export function PrivateRoute({ children, ...rest }) {
+export function AuthGate({ children, ...rest }) {
   const { signedIn } = useAuth();
 
   if (signedIn === null) {
     return <div>Loading...</div>;
   }
 
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        signedIn ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: location },
-            }}
-          />
-        )
-      }
-    />
-  );
+  if (!signedIn) {
+    return <Redirect to="/login" />;
+  }
+
+  // user is logged in
+  return children;
 }
 ```
 
 #### Usage
 
 ```jsx
-import PrivateRoute from "components/privteroute.jsx";
+import React from "react";
+import { Switch, Route } from "react-router-dom";
+import { AuthGate } from "components/auth-gate";
 
 <Router>
   <Switch>
@@ -190,14 +177,18 @@ import PrivateRoute from "components/privteroute.jsx";
     <Route exact path="/login">
       <Login />
     </Route>
-    /* Protected routes */
-    <PrivateRoute exact path="/">
-      <Dashboard />
-    </PrivateRoute>
-    <PrivateRoute exact path="/settings">
-      <Settings />
-    </PrivateRoute>
   </Switch>
+  /* Protected routes */
+  <AuthGate>
+    <Switch>
+      <Route exact path="/">
+        <Dashboard />
+      </Route>
+      <Route exact path="/settings">
+        <Settings />
+      </Route>
+    </Switch>
+  </AuthGate>
 </Router>;
 ```
 
@@ -247,9 +238,13 @@ export default privateRoute(Dashboard);
 
 ## Is `nhost-js-sdk` required?
 
-No. You can use `react-nhost` without `nhost-js-sdk`. if you do, all requests will be sent without an `Authorization` header. This means you can only interact with data that is allowed using the role set as `HASURA_GRAPHQL_UNAUTHORIZED_ROLE`. (default to `public` at Nhost) [Learn more about public access](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/unauthenticated-access.html).
+No. You can use `react-nhost` without `nhost-js-sdk`.
 
-Here's an example:
+## How do I add headers to my GraphQL requests?
+
+Use the `headers` prop.
+
+Here is an example on how to add `role = public` to each request. This means you can only interact with data that is allowed using the role set as `HASURA_GRAPHQL_UNAUTHORIZED_ROLE`. (default to `public` at [Nhost](https://nhost.io)) [Learn more about public access](https://hasura.io/docs/1.0/graphql/manual/auth/authentication/unauthenticated-access.html).
 
 ```jsx
 import React from "react";
@@ -260,7 +255,10 @@ import App from "./App";
 ReactDOM.render(
   <React.StrictMode>
     <NhostApolloProvider
-      gql_endpoint={`https://hasura-xxx.nhost.app/v1/graphql`}
+      gqlEndpoint={`https://hasura-xxx.nhost.app/v1/graphql`}
+      headers={{
+        role: "public",
+      }}
     >
       <App />
     </NhostApolloProvider>
