@@ -7,7 +7,14 @@ import { createHttpLink } from "apollo-link-http";
 import { from, split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
 
-export function generateApolloClient(auth, gqlEndpoint, headers) {
+export function generateApolloClient(
+  auth,
+  gqlEndpoint,
+  headers,
+  publicRole = "public"
+) {
+  console.log("in generateApolloClient()");
+
   const getheaders = (auth) => {
     // add headers
     const resHeaders = {
@@ -20,35 +27,58 @@ export function generateApolloClient(auth, gqlEndpoint, headers) {
       if (auth.isAuthenticated()) {
         resHeaders.authorization = `Bearer ${auth.getJWTToken()}`;
       } else {
-        resHeaders.role = "public";
+        resHeaders.role = publicRole;
       }
     }
 
-    // return
     return resHeaders;
   };
 
+  const ssr = typeof window === "undefined";
   const uri = gqlEndpoint;
 
   const wsUri = uri.startsWith("https")
     ? uri.replace(/^https/, "wss")
     : uri.replace(/^http/, "ws");
 
-  const wsLink = process.browser
+  const wsLink = !ssr
     ? new WebSocketLink({
         uri: wsUri,
         options: {
           reconnect: true,
-          connectionParams: (wut) => {
+          connectionParams: () => {
+            console.log("in connectionParams()");
+            const connectionHeaders = getheaders(auth);
+            console.log(connectionHeaders);
             return {
-              headers: {
-                ...getheaders(auth),
-              },
+              headers: connectionHeaders,
             };
           },
         },
       })
     : null;
+
+  if (!ssr) {
+    wsLink.subscriptionClient.on("connecting", () => {
+      console.log("connecting");
+    });
+
+    wsLink.subscriptionClient.on("connected", () => {
+      console.log("connected");
+    });
+
+    wsLink.subscriptionClient.on("reconnecting", () => {
+      console.log("reconnecting");
+    });
+
+    wsLink.subscriptionClient.on("reconnected", () => {
+      console.log("reconnected");
+    });
+
+    wsLink.subscriptionClient.on("disconnected", () => {
+      console.log("disconnected");
+    });
+  }
 
   const httplink = createHttpLink({
     uri,
@@ -63,9 +93,7 @@ export function generateApolloClient(auth, gqlEndpoint, headers) {
     };
   });
 
-  // same here, we check if we are in the browser.
-  // the problem is, how I could use this Apollo client in the server... ?
-  const link = process.browser
+  const link = !ssr
     ? split(
         ({ query }) => {
           const { kind, operation } = getMainDefinition(query);
@@ -77,7 +105,7 @@ export function generateApolloClient(auth, gqlEndpoint, headers) {
     : httplink;
 
   const client = new ApolloClient({
-    ssr: false,
+    ssr: ssr,
     link: from([link]),
     cache: new InMemoryCache(),
     defaultOptions: {
@@ -90,39 +118,43 @@ export function generateApolloClient(auth, gqlEndpoint, headers) {
   return { client, wsLink };
 }
 
-// const client = generateApolloClient(
-//   null,
-//   `https://hasura-zgp96xwz.nhost.app/v1/graphql`
-// );
-
-// export function NhostApolloProvider(props) {
-// const [client] = useState(() =>
-//   generateApolloClient(props.auth, props.gqlEndpoint)
-// );
 export class NhostApolloProvider extends React.Component {
   constructor(props) {
     super(props);
-    const { auth, gqlEndpoint, headers } = this.props;
-    const { client, wsLink } = generateApolloClient(auth, gqlEndpoint, headers);
+
+    console.log("Nhost Apollo Provider constructor()");
+
+    const { auth, gqlEndpoint, headers, publicRole = "public" } = this.props;
+    const { client, wsLink } = generateApolloClient(
+      auth,
+      gqlEndpoint,
+      headers,
+      publicRole
+    );
     this.client = client;
     this.wsLink = wsLink;
 
     if (this.props.auth) {
       this.props.auth.onAuthStateChanged((data) => {
-        // close previous subscription
+        console.log("onAuthStateChanged()");
         try {
-          this.wsLink.subscriptionClient.close(true, true);
+          // reconnect ws connection with new auth headers for the logged in user
+          console.log("reconnecting subscription?");
+          if (this.wsLink.subscriptionClient.status === 1) {
+            console.log("Yes reconnecting subscription");
+            this.wsLink.subscriptionClient.tryReconnect();
+          } else {
+            console.log(
+              `don't reconnect subscription, status: ${this.wsLink.subscriptionClient.status}`
+            );
+          }
         } catch (error) {
           // noop. Probably not in a browser
         }
 
-        // generate new apolloClient with the new logged in state
-        const { client, wsLink } = generateApolloClient(auth, gqlEndpoint);
-        this.client = client;
-        this.wsLink = wsLink;
-        if (this.is_mounted) {
-          this.forceUpdate();
-        }
+        // if (this.is_mounted) {
+        //   this.forceUpdate();
+        // }
       });
     }
   }
