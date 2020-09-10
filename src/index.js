@@ -13,8 +13,6 @@ export function generateApolloClient(
   headers,
   publicRole = "public"
 ) {
-  console.log("in generateApolloClient()");
-
   const getheaders = (auth) => {
     // add headers
     const resHeaders = {
@@ -47,9 +45,7 @@ export function generateApolloClient(
         options: {
           reconnect: true,
           connectionParams: () => {
-            console.log("in connectionParams()");
             const connectionHeaders = getheaders(auth);
-            console.log(connectionHeaders);
             return {
               headers: connectionHeaders,
             };
@@ -57,28 +53,6 @@ export function generateApolloClient(
         },
       })
     : null;
-
-  if (!ssr) {
-    wsLink.subscriptionClient.on("connecting", () => {
-      console.log("connecting");
-    });
-
-    wsLink.subscriptionClient.on("connected", () => {
-      console.log("connected");
-    });
-
-    wsLink.subscriptionClient.on("reconnecting", () => {
-      console.log("reconnecting");
-    });
-
-    wsLink.subscriptionClient.on("reconnected", () => {
-      console.log("reconnected");
-    });
-
-    wsLink.subscriptionClient.on("disconnected", () => {
-      console.log("disconnected");
-    });
-  }
 
   const httplink = createHttpLink({
     uri,
@@ -122,8 +96,6 @@ export class NhostApolloProvider extends React.Component {
   constructor(props) {
     super(props);
 
-    console.log("Nhost Apollo Provider constructor()");
-
     const { auth, gqlEndpoint, headers, publicRole = "public" } = this.props;
     const { client, wsLink } = generateApolloClient(
       auth,
@@ -135,36 +107,20 @@ export class NhostApolloProvider extends React.Component {
     this.wsLink = wsLink;
 
     if (this.props.auth) {
-      this.props.auth.onAuthStateChanged((data) => {
-        console.log("onAuthStateChanged()");
-        try {
-          // reconnect ws connection with new auth headers for the logged in user
-          console.log("reconnecting subscription?");
-          if (this.wsLink.subscriptionClient.status === 1) {
-            console.log("Yes reconnecting subscription");
-            this.wsLink.subscriptionClient.tryReconnect();
-          } else {
-            console.log(
-              `don't reconnect subscription, status: ${this.wsLink.subscriptionClient.status}`
-            );
-          }
-        } catch (error) {
-          // noop. Probably not in a browser
+      this.props.auth.onTokenChanged(() => {
+        if (this.wsLink.subscriptionClient.status === 1) {
+          this.wsLink.subscriptionClient.tryReconnect();
+        } else {
         }
+      });
 
-        // if (this.is_mounted) {
-        //   this.forceUpdate();
-        // }
+      this.props.auth.onAuthStateChanged((data) => {
+        // reconnect ws connection with new auth headers for the logged in user
+        if (this.wsLink.subscriptionClient.status === 1) {
+          this.wsLink.subscriptionClient.tryReconnect();
+        }
       });
     }
-  }
-
-  componentDidMount() {
-    this.is_mounted = true;
-  }
-
-  componentWillUnmount() {
-    this.is_mounted = false;
   }
 
   render() {
