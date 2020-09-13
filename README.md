@@ -211,7 +211,7 @@ export function privateRoute(Component) {
     }
 
     if (!signedIn) {
-      return <div>Login form or redirect to `/login`.<div>;
+      return <div>Login form or redirect to `/login`.</div>;
     }
 
     return (<Component {...arguments} />);
