@@ -9,7 +9,7 @@ export function NhostApolloProvider(
   headers?: {
     [key: string]: any;
   },
-  publicRole: string
+  publicRole?: string
 ): JSX.Element;
 
 export function useAuth(): useAuthProps;
