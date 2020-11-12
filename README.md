@@ -1,3 +1,9 @@
+# WARNING: Depricated
+
+This package is depricated for [@nhost/react-auth](https://www.npmjs.com/package/@nhost/react-auth) and [@nhost/react-apollo](https://www.npmjs.com/package/@nhost/react-apollo).
+
+---
+
 # React Nhost
 
 Make it easy to use Nhost with React.
@@ -214,7 +220,7 @@ export function privateRoute(Component) {
       return <div>Login form or redirect to `/login`.</div>;
     }
 
-    return (<Component {...arguments} />);
+    return <Component {...arguments} />;
   };
 }
 ```
